@@ -1,0 +1,37 @@
+Change the project so that:
+1. The program, by default, reads the reference course folder, and generates the templates during
+every run. 
+2. The program takes the input of the number of modules in each lesson, along with the number of
+lessons. If not given, it defaults to 5. 
+3. Each of these modules have the same structure, as defined by the template generated.
+4. The topic is given as a run time input, the program needs to firstly generate (using ai)
+a list of topics to structure as modules. 
+This includes the time it will take, what the goals are, and references for learning like real 
+python learning modules, documentation links etc. Once that is done, it has to create the module
+according to the template, based on these topics and one by one, fill in the content
+i.e. (readme files, assignments, examples, exercises etc.)
+5. Make sure that all of the content is ai generated, and the progress bar depicts a detailed 
+list of the modules being generated, and are being generated.
+6. Run the tests once the  course is generated. 
+
+
+-----------------------------
+7. fix the starter example content issue: errors.txt should be empty
+8. input sanitation: snake case issue: just take inputs in the form of text within a string and 
+don't mandate snake case. convert it to lower yourself.
+9. difficulty variation add input: a flag with two difficulties -b for beginener, -i for intermediate
+-a for advanced, and the difficulty of assigments generated should be there accordingly. 
+10. fix the coverage: check the test coverage and add tests whenever needed to bring the coverage to
+ more than 97%. 
+11. pytest,pylint for the whole project: do linting and check for any 
+12. red, green and blue phases: to be implemented
+13. update the documentation: write the documentation for all the code in the lesson generator project
+14. update the readme: make sure it's up to date. 
+
+
+
+cd /home/swechcha/DP_3 && /home/swechcha/DP_3/venv/bin/python -m 
+lesson_generator.cli.main create "oops with python" --modules 3 
+--difficulty beginner --no-cache --strict-ai --output 
+/home/swechcha/DP_3/generated_lessons
+

@@ -1,0 +1,62 @@
+"""
+{{ (assignment.title ~ ": " ~ assignment.description) | docstring }}
+"""
+
+{% for import_stmt in assignment.imports %}
+{{ import_stmt }}
+{% endfor %}
+
+
+class {{ assignment.class_name }}:
+    """
+    {{ assignment.class_description | docstring }}
+    {{ assignment.learning_focus | docstring }}
+    """
+    
+    {% for method in assignment.methods %}
+    def {{ method.name }}(self{{ method.parameters }}):
+{{ '        ' }}"""
+{{ (method.docstring | docstring) | indent(8) }}
+{{ '        ' }}
+{{ '        ' }}Args:
+{% for param in method.args %}
+{{ '        ' }}    {{ param.name }} ({{ param.type }}): {{ param.description | docstring }}
+{% endfor %}
+{{ '        ' }}
+{{ '        ' }}Returns:
+{{ '        ' }}    {{ method.return_type }}: {{ method.return_description | docstring }}
+{{ '        ' }}
+{% if method.examples %}
+{{ '        ' }}Examples:
+{% for example in method.examples %}
+{{ '        ' }}    >>> {{ example.usage }}
+{{ '        ' }}    {{ example.expected_output }}
+{% endfor %}
+{% endif %}
+{{ '        ' }}"""
+{{ method.implementation | indent(8, True) }}
+    
+    {% endfor %}
+
+{% if assignment.helper_functions %}
+{% for function in assignment.helper_functions %}
+
+def {{ function.name }}({{ function.parameters }}):
+    """
+    {{ function.docstring | docstring }}
+    """
+{{ function.implementation | indent(4, True) }}
+
+{% endfor %}
+{% endif %}
+
+{% if assignment.examples %}
+
+if __name__ == "__main__":
+    # Example usage - students can run this to see the class in action
+    {% for example in assignment.examples %}
+    
+    # {{ example.description }}
+{{ example.code | indent(4, True) }}
+    {% endfor %}
+{% endif %}

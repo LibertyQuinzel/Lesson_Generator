@@ -1,0 +1,14 @@
+# Extra Exercises: {{ module.title }}
+
+Try these additional exercises to deepen your understanding:
+
+{% for focus in (module.focus_areas or []) %}
+## {{ focus|title|replace('_',' ') }}
+- Implement a small example using {{ focus }} in a different context.
+- Identify edge cases where {{ focus }} might fail and handle them.
+- Write at least two tests covering success and failure for your example.
+{% endfor %}
+
+## Reflection
+- What did you learn from these exercises?
+- How would you teach this concept to someone else?

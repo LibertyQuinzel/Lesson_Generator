@@ -1,0 +1,55 @@
+name: Lesson Generator - Tests
+
+on:
+  push:
+    paths:
+      - 'lesson_generator/**'
+  pull_request:
+    paths:
+      - 'lesson_generator/**'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r lesson_generator/requirements.txt
+          pip install -e lesson_generator
+
+      - name: Lint - Black
+        working-directory: lesson_generator
+        run: black --check .
+
+      - name: Lint - isort
+        working-directory: lesson_generator
+        run: isort --check-only .
+
+      - name: Lint - Pylint
+        working-directory: lesson_generator
+        run: |
+          pylint src/lesson_generator tests --disable=C0114,C0115,C0116,R0903,W1203
+
+      - name: Type Check - mypy
+        working-directory: lesson_generator
+        run: mypy --config-file mypy.ini src/lesson_generator
+
+      - name: Run tests
+        working-directory: lesson_generator
+        run: pytest -q
+
+      - name: Build package
+        working-directory: lesson_generator
+        run: |
+          python -m pip install build twine
+          python -m build
+          python -m twine check dist/*

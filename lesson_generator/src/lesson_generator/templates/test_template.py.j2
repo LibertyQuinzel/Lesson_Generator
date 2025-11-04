@@ -1,0 +1,153 @@
+"""
+Test file for {{ test_target_name }}
+
+This test file provides comprehensive coverage for {{ test_target_description | docstring }}.
+Students should run these tests to validate their implementations.
+"""
+
+import pytest
+{% for import_stmt in test_imports %}
+{{ import_stmt }}
+{% endfor %}
+from {{ module_path }} import {{ class_name }}
+
+
+class Test{{ class_name }}:
+    """
+    Comprehensive test suite for {{ class_name }}.
+    
+    These tests cover:
+    {% for coverage_area in test_coverage_areas %}
+    - {{ coverage_area | docstring }}
+    {% endfor %}
+    """
+    
+    {% if fixtures %}
+    {% for fixture in fixtures %}
+    @pytest.fixture
+    def {{ fixture.name }}(self):
+        """{{ fixture.description }}"""
+        {{ fixture.setup_code }}
+    
+    {% endfor %}
+    {% endif %}
+    
+    {% for test_method in test_methods %}
+    def test_{{ test_method.name }}(self{% if test_method.fixtures %}, {{ test_method.fixtures|join(', ') }}{% endif %}):
+{{ '        ' }}"""
+{{ (test_method.description | docstring) | indent(8) }}
+{{ '        ' }}
+{{ '        ' }}Tests: {{ test_method.tests | docstring }}
+{{ '        ' }}"""
+    {% if is_template %}assert False, "TODO: implement"{% endif %}
+    # GIVEN
+{{ (test_method.given_section | default('', true)) | indent(8, True) }}
+        
+    # WHEN  
+{{ (test_method.when_section | default('', true)) | indent(8, True) }}
+        
+    # THEN
+{{ (test_method.then_section | default('', true)) | indent(8, True) }}
+    
+    {% endfor %}
+    
+    {% if parametrized_tests %}
+    {% for param_test in parametrized_tests %}
+    @pytest.mark.parametrize("{{ param_test.parameters }}", {{ param_test.test_data }})
+    def test_{{ param_test.name }}(self, {{ param_test.parameters }}):
+{{ '        ' }}"""
+{{ (param_test.description | docstring) | indent(8) }}
+{{ '        ' }}"""
+    {% if is_template %}assert False, "TODO: implement"{% endif %}
+    # GIVEN
+{{ (param_test.given_section | default('', true)) | indent(8, True) }}
+        
+    # WHEN
+{{ (param_test.when_section | default('', true)) | indent(8, True) }}
+        
+    # THEN  
+{{ (param_test.then_section | default('', true)) | indent(8, True) }}
+    
+    {% endfor %}
+    {% endif %}
+    
+    {% if error_tests %}
+    {% for error_test in error_tests %}
+    def test_{{ error_test.name }}_raises_{{ error_test.exception_name|lower }}(self):
+{{ '        ' }}"""
+{{ (error_test.description | docstring) | indent(8) }}
+{{ '        ' }}"""
+    {% if is_template %}assert False, "TODO: implement"{% endif %}
+    # GIVEN
+{{ (error_test.given_section | default('', true)) | indent(8, True) }}
+        
+        # WHEN/THEN
+        with pytest.raises({{ error_test.exception_name }}){% if error_test.error_message %} as exc_info{% endif %}:
+{{ (error_test.when_section | default('', true)) | indent(12, True) }}
+        
+        {% if error_test.error_message %}
+        assert "{{ error_test.error_message }}" in str(exc_info.value)
+        {% endif %}
+    
+    {% endfor %}
+    {% endif %}
+
+
+{% if integration_tests %}
+class TestIntegration{{ class_name }}:
+    """
+    Integration tests for {{ class_name }} with external dependencies.
+    """
+    
+    {% for integration_test in integration_tests %}
+    def test_{{ integration_test.name }}(self):
+{{ '        ' }}"""
+{{ (integration_test.description | docstring) | indent(8) }}
+{{ '        ' }}"""
+    {% if is_template %}assert False, "TODO: implement"{% endif %}
+{{ integration_test.implementation | indent(8, True) }}
+    
+    {% endfor %}
+{% endif %}
+
+
+{% if performance_tests %}
+@pytest.mark.performance
+class TestPerformance{{ class_name }}:
+    """
+    Performance tests for {{ class_name }}.
+    Run with: pytest -m performance
+    """
+    
+    {% for perf_test in performance_tests %}
+    def test_{{ perf_test.name }}_performance(self):
+{{ '        ' }}"""
+{{ (perf_test.description | docstring) | indent(8) }}
+{{ '        ' }}"""
+        {% if is_template %}pytest.skip("TODO: implement"){% endif %}
+        import time
+        
+        start_time = time.time()
+{{ perf_test.implementation | indent(8, True) }}
+        execution_time = time.time() - start_time
+        
+        assert execution_time < {{ perf_test.max_time }}, f"Execution took {execution_time:.2f}s, expected < {{ perf_test.max_time }}s"
+    
+    {% endfor %}
+{% endif %}
+
+
+# Additional test utilities
+{% if test_utilities %}
+{% for utility in test_utilities %}
+def {{ utility.name }}({{ utility.parameters }}):
+    """{{ utility.description }}"""
+    {{ utility.implementation }}
+
+{% endfor %}
+{% endif %}
+
+
+if __name__ == "__main__":
+    # Run tests when file is executed directly
+    pytest.main([__file__, "-v", "--tb=short"])

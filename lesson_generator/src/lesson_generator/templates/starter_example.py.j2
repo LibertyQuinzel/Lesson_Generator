@@ -1,0 +1,118 @@
+"""
+Starter Example: {{ example.title | docstring }}
+
+{{ example.description | docstring }}
+
+LEARNING OBJECTIVES:
+{% for objective in example.learning_objectives %}
+- {{ objective | docstring }}
+{% endfor %}
+
+CONCEPTS AND RATIONALE:
+{{ example.detailed_explanation | docstring }}
+
+API SUMMARY:
+- Class: {{ example.class_name }}
+{% for method in example.methods %}
+- {{ method.name }}({{ method.parameters|trim }}) -> {{ method.return_type }}  | demonstrates: {{ method.demonstrates }}
+{% endfor %}
+
+STEP-BY-STEP WALKTHROUGH:
+1. Instantiate {{ example.class_name }} and call demo() to verify setup returns 'ok'.
+2. Explore each method using the examples below the method docstrings.
+3. Modify inputs and observe behavior for edge cases.
+
+EXERCISES:
+- Add one more example for each method (happy path).
+- Identify edge cases and write assertions in tests.
+- Consider performance or readability tradeoffs and document them.
+
+TIPS:
+- Keep inputs deterministic and simple.
+- Prefer small, well-named methods.
+- Use docstring examples as living documentation.
+"""
+
+{% for import_stmt in example.imports %}
+{{ import_stmt }}
+{% endfor %}
+
+
+class {{ example.class_name }}:
+    """
+    {{ example.class_description | docstring }}
+    
+    This class demonstrates {{ example.concepts|join(', ') }} through practical examples.
+    """
+    
+    {% for method in example.methods %}
+    def {{ method.name }}(self{{ method.parameters }}):
+{{ '        ' }}"""
+{{ (method.docstring | docstring) | indent(8) }}
+{{ '        ' }}
+{{ '        ' }}This method demonstrates: {{ method.demonstrates }}
+{{ '        ' }}
+{{ '        ' }}Args:
+{% for param in method.args %}
+{{ '        ' }}    {{ param.name }} ({{ param.type }}): {{ param.description }}
+{% endfor %}
+{{ '        ' }}
+{{ '        ' }}Returns:
+{{ '        ' }}    {{ method.return_type }}: {{ method.return_description }}
+{{ '        ' }}
+{{ '        ' }}Example:
+{{ '        ' }}    >>> helper = {{ example.class_name }}()
+{{ '        ' }}    >>> {{ method.example_usage }}
+{{ '        ' }}    {{ method.example_output }}
+{{ '        ' }}"""
+{% if method.explanation %}
+{{ '        ' }}# {{ method.explanation | docstring }}
+{% endif %}
+{{ method.implementation | indent(8, True) }}
+    
+    {% endfor %}
+
+{% if example.demonstration_functions %}
+{% for demo in example.demonstration_functions %}
+
+def {{ demo.name }}():
+    """
+    {{ demo.description | docstring }}
+    
+    This function shows {{ demo.demonstrates }} in practice.
+    """
+    print("\\n" + "=" * 50)
+    print("{{ demo.title }}")
+    print("=" * 50)
+    
+{{ demo.implementation | indent(4, True) }}
+
+{% endfor %}
+{% endif %}
+
+
+if __name__ == "__main__":
+    """
+    Demonstration script showing {{ example.title }} concepts.
+    
+    Run this file to see the examples in action:
+    python {{ example.filename }}
+    """
+    
+    print("{{ example.title }} - Interactive Examples")
+    print("=" * 60)
+    
+    {% for demo in example.demonstrations %}
+    {{ demo.function_call }}
+    {% endfor %}
+    
+    print("\\n" + "=" * 60)
+    print("🎉 Examples completed! Review the code above to understand:")
+    {% for concept in example.concepts %}
+    print("   • {{ concept|title|replace('_', ' ') }}")
+    {% endfor %}
+    print("\\nNext steps:")
+    print("   1. Experiment with the code above")
+    print("   2. Try modifying the examples")  
+    print("   3. Move on to the assignment files")
+    print("=" * 60)

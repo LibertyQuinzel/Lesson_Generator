@@ -1,0 +1,201 @@
+[
+  {
+    "name": "async_programming",
+    "title": "Asynchronous Programming in Python",
+    "description": "Comprehensive guide to async/await, event loops, and concurrent programming patterns in Python using asyncio and related libraries.",
+    "difficulty": "intermediate",
+    "estimated_hours": 8,
+    "prerequisites": ["basic_python", "functions", "oop_basics"],
+    "learning_objectives": [
+      "Understand the fundamentals of asynchronous programming",
+      "Master async/await syntax and coroutine concepts", 
+      "Implement concurrent programming patterns using asyncio",
+      "Handle asynchronous I/O operations effectively",
+      "Debug and test asynchronous code"
+    ],
+    "key_concepts": [
+      "coroutines",
+      "event_loop",
+      "asyncio",
+      "concurrent_futures",
+      "async_context_managers",
+      "async_generators",
+      "aiohttp",
+      "async_testing"
+    ],
+    "programming_language": "python",
+    "tags": ["concurrency", "performance", "networking", "python"],
+    "modules": [
+      {
+        "name": "async_basics",
+        "title": "Async/Await Fundamentals",
+        "type": "starter",
+        "focus_areas": ["async_await_syntax", "coroutines", "basic_event_loop"],
+        "complexity": "simple",
+        "estimated_time": 90
+      },
+      {
+        "name": "asyncio_operations", 
+        "title": "AsyncIO Operations",
+        "type": "assignment",
+        "focus_areas": ["asyncio_tasks", "futures", "concurrent_execution"],
+        "complexity": "moderate",
+        "estimated_time": 120
+      },
+      {
+        "name": "async_context_management",
+        "title": "Async Context Managers",
+        "type": "assignment", 
+        "focus_areas": ["async_with", "resource_management", "cleanup"],
+        "complexity": "moderate",
+        "estimated_time": 90
+      },
+      {
+        "name": "async_networking",
+        "title": "Asynchronous Networking",
+        "type": "advanced",
+        "focus_areas": ["aiohttp", "websockets", "async_requests"],
+        "complexity": "complex",
+        "estimated_time": 150
+      },
+      {
+        "name": "async_testing_patterns",
+        "title": "Testing Async Code", 
+        "type": "project",
+        "focus_areas": ["pytest_asyncio", "mocking_async", "async_fixtures"],
+        "complexity": "complex",
+        "estimated_time": 120
+      }
+    ]
+  },
+  {
+    "name": "design_patterns",
+    "title": "Software Design Patterns in Python", 
+    "description": "Implementation and application of classic and modern design patterns for creating maintainable, scalable Python applications.",
+    "difficulty": "intermediate",
+    "estimated_hours": 12,
+    "prerequisites": ["oop_advanced", "solid_principles", "python_advanced"],
+    "learning_objectives": [
+      "Implement classic Gang of Four design patterns",
+      "Apply creational patterns for object construction",
+      "Use structural patterns for object composition", 
+      "Implement behavioral patterns for object interaction",
+      "Choose appropriate patterns for specific problems"
+    ],
+    "key_concepts": [
+      "singleton",
+      "factory_method",
+      "abstract_factory", 
+      "builder_pattern",
+      "observer_pattern",
+      "strategy_pattern",
+      "decorator_pattern",
+      "adapter_pattern"
+    ],
+    "programming_language": "python",
+    "tags": ["architecture", "oop", "patterns", "software_design"],
+    "modules": [
+      {
+        "name": "creational_patterns",
+        "title": "Creational Design Patterns",
+        "type": "starter", 
+        "focus_areas": ["singleton", "factory", "builder"],
+        "complexity": "moderate",
+        "estimated_time": 150
+      },
+      {
+        "name": "structural_patterns",
+        "title": "Structural Design Patterns",
+        "type": "assignment",
+        "focus_areas": ["adapter", "decorator", "facade"],
+        "complexity": "moderate", 
+        "estimated_time": 120
+      },
+      {
+        "name": "behavioral_patterns",
+        "title": "Behavioral Design Patterns", 
+        "type": "assignment",
+        "focus_areas": ["observer", "strategy", "command"],
+        "complexity": "complex",
+        "estimated_time": 150
+      },
+      {
+        "name": "modern_python_patterns",
+        "title": "Modern Python Patterns",
+        "type": "advanced",
+        "focus_areas": ["context_managers", "descriptors", "metaclasses"],
+        "complexity": "complex",
+        "estimated_time": 180
+      },
+      {
+        "name": "pattern_composition",
+        "title": "Combining Design Patterns",
+        "type": "project", 
+        "focus_areas": ["pattern_interactions", "architecture_design", "real_world_application"],
+        "complexity": "complex",
+        "estimated_time": 210
+      }
+    ]
+  },
+  {
+    "name": "testing_strategies",
+    "title": "Advanced Testing Strategies in Python",
+    "description": "Comprehensive testing approaches including unit testing, integration testing, mocking, and test-driven development practices.",
+    "difficulty": "intermediate", 
+    "estimated_hours": 10,
+    "prerequisites": ["basic_testing", "pytest_basics", "python_intermediate"],
+    "learning_objectives": [
+      "Master advanced pytest features and fixtures",
+      "Implement effective mocking and test doubles",
+      "Design comprehensive test suites with proper coverage",
+      "Apply test-driven development methodology", 
+      "Perform integration and end-to-end testing"
+    ],
+    "key_concepts": [
+      "pytest_fixtures",
+      "parametrized_tests",
+      "mocking_strategies", 
+      "test_doubles",
+      "tdd_workflow",
+      "integration_testing",
+      "property_based_testing",
+      "test_coverage"
+    ],
+    "programming_language": "python",
+    "tags": ["testing", "tdd", "quality_assurance", "pytest"],
+    "modules": [
+      {
+        "name": "advanced_pytest",
+        "title": "Advanced Pytest Techniques",
+        "type": "starter",
+        "focus_areas": ["fixtures", "parametrization", "markers"],
+        "complexity": "moderate",
+        "estimated_time": 120
+      },
+      {
+        "name": "mocking_and_doubles", 
+        "title": "Mocking and Test Doubles",
+        "type": "assignment",
+        "focus_areas": ["unittest_mock", "pytest_mock", "test_isolation"],
+        "complexity": "moderate",
+        "estimated_time": 90
+      },
+      {
+        "name": "tdd_practice",
+        "title": "Test-Driven Development",
+        "type": "assignment",
+        "focus_areas": ["red_green_refactor", "tdd_workflow", "design_emergence"],
+        "complexity": "moderate", 
+        "estimated_time": 150
+      },
+      {
+        "name": "integration_testing",
+        "title": "Integration and E2E Testing",
+        "type": "advanced",
+        "focus_areas": ["database_testing", "api_testing", "system_testing"],
+        "complexity": "complex",
+        "estimated_time": 120
+      }
+    ]
+  }
+]

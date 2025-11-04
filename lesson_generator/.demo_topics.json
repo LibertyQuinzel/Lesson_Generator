@@ -1,0 +1,40 @@
+{
+  "name": "python_iteration",
+  "title": "Python Iteration Patterns",
+  "description": "Deep dive into Python iterators, generators, and lazy evaluation techniques.",
+  "difficulty": "intermediate",
+  "estimated_hours": 4,
+  "prerequisites": ["python_basics", "functions"],
+  "learning_objectives": [
+    "Explain the iterator protocol (__iter__ and __next__)",
+    "Build and use generator functions and expressions",
+    "Apply lazy evaluation for performance and memory efficiency",
+    "Design iterable classes with clear invariants",
+    "Test edge cases and error handling for iterators"
+  ],
+  "key_concepts": ["iterators", "generators", "lazy_evaluation"],
+  "modules": [
+    {
+      "name": "iteration",
+      "title": "Iterators, Generators, and Lazy Evaluation",
+      "type": "assignment",
+      "focus_areas": ["iterators", "generators", "lazy_evaluation"],
+      "complexity": "moderate",
+      "estimated_time": 90,
+      "includes_tests": true,
+      "code_examples": 3
+    }
+  ],
+  "tags": ["python", "iteration", "performance"],
+  "resources": {
+    "documentation_links": [
+      "https://docs.python.org/3/tutorial/classes.html#iterator-objects",
+      "https://docs.python.org/3/reference/expressions.html#generator-expressions"
+    ],
+    "example_repositories": [],
+    "additional_reading": [
+      "PEP 255: Simple Generators",
+      "PEP 342: Coroutines via Enhanced Generators"
+    ]
+  }
+}
