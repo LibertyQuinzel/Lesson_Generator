@@ -1,0 +1,9 @@
+[oops_with_python] module 1:introduction_to_oops step=starter_example -> invalid syntax (starter_example.py, line 24)
+[oops_with_python] module 1:introduction_to_oops step=assignment_a -> invalid syntax (assignment_a.py, line 13)
+[oops_with_python] module 1:introduction_to_oops step=tests_a -> 'dict object' has no attribute 'given_section'
+[oops_with_python] module 2:advanced_oop_concepts step=learning_path -> 'dict object' has no attribute 'Inheritance'
+[oops_with_python] module 2:advanced_oop_concepts step=starter_example -> unexpected indent (starter_example.py, line 99)
+[oops_with_python] module 2:advanced_oop_concepts step=assignment_a -> invalid syntax (assignment_a.py, line 13)
+[oops_with_python] module 2:advanced_oop_concepts step=tests_a -> 'dict object' has no attribute 'given_section'
+[oops_with_python] module 2:advanced_oop_concepts step=assignment_b -> invalid syntax (assignment_b.py, line 13)
+[oops_with_python] module 2:advanced_oop_concepts step=tests_b -> invalid syntax (test_assignment_b.py, line 31)

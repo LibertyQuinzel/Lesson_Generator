@@ -1,0 +1,25 @@
+[run]
+relative_files = True
+source =
+    lesson_generator/src/lesson_generator
+omit =
+    */tests/*
+    */test_*
+    lesson_generator/src/lesson_generator/content/openai_generator.py
+    lesson_generator/src/lesson_generator/core/template_extractor.py
+    lesson_generator/src/lesson_generator/core/generator.py
+    lesson_generator/src/lesson_generator/content/__init__.py
+    lesson_generator/src/lesson_generator/cli/main.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.
+    class .*Protocol\):
+    @(abc\.)?abstractmethod

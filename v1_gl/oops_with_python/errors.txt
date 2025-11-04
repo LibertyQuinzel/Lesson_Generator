@@ -1,0 +1,5 @@
+[oops_with_python] module 1:introduction_to_oop step=starter_example -> invalid syntax (starter_example.py, line 25)
+[oops_with_python] module 1:introduction_to_oop step=assignment_a -> invalid syntax (assignment_a.py, line 13)
+[oops_with_python] module 1:introduction_to_oop step=tests_a -> invalid syntax (test_assignment_a.py, line 30)
+[oops_with_python] module 2:advanced_oop_concepts step=assignment_a -> invalid syntax (assignment_a.py, line 13)
+[oops_with_python] module 2:advanced_oop_concepts step=assignment_b -> invalid syntax (assignment_b.py, line 13)

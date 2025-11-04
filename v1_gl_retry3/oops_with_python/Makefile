@@ -1,0 +1,23 @@
+# Makefile for oops_with_python lesson
+
+.PHONY: format lint type-check test test-fast test-performance check-all
+
+format:
+	black .
+
+lint:
+	pylint $(shell git ls-files '*.py') || true
+
+type-check:
+	python -m py_compile $(shell git ls-files '*.py')
+
+test:
+	pytest -q --cov
+
+test-fast:
+	pytest -q
+
+test-performance:
+	pytest -q -m performance
+
+check-all: format lint type-check test

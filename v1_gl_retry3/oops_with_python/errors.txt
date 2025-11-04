@@ -1,0 +1,5 @@
+[oops_with_python] module 1:intro_oop step=starter_example -> invalid syntax (starter_example.py, line 25)
+[oops_with_python] module 1:intro_oop step=assignment_a -> invalid syntax (assignment_a.py, line 13)
+[oops_with_python] module 2:advanced_oop step=starter_example -> expected an indented block after class definition on line 60 (starter_example.py, line 61)
+[oops_with_python] module 2:advanced_oop step=assignment_a -> invalid syntax (assignment_a.py, line 13)
+[oops_with_python] module 2:advanced_oop step=assignment_b -> invalid syntax (assignment_b.py, line 13)
