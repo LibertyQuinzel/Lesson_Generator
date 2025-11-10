@@ -1,0 +1,66 @@
+"""
+Student-facing test template for Assignment A
+
+This template intentionally contains TODOs and failing placeholders so students
+can iteratively implement tests for the provided assignment code. It follows
+the GIVEN / WHEN / THEN structure and encourages four focused tests: happy-path,
+edge-case, error-handling and an additional contract/behaviour test.
+"""
+
+import pytest
+
+{% for import_stmt in test_imports %}
+{{ import_stmt }}
+{% endfor %}
+{% if module_path and class_name %}
+from {{ module_path }} import {{ class_name }}
+{% endif %}
+
+"""
+STUDENT TASK
+
+Replace the TODO sections below with concrete tests for {{ test_target_name }}.
+Use the GIVEN / WHEN / THEN comments to keep tests well-structured.
+Aim for at least four focused tests: happy-path, edge-case, error-handling and an
+additional behavioural/contract test.
+"""
+
+def test_happy_path_todo():
+    """Happy-path: replace with a concrete assertion."""
+    # GIVEN
+    obj = {{ class_name }}() if '{{ class_name }}' else None
+    # WHEN
+    # TODO: call a representative method on obj
+    # THEN
+    pytest.fail("TODO: implement happy-path assertion")
+
+
+def test_edge_case_todo():
+    """Edge-case: invalid or boundary inputs should be handled."""
+    # GIVEN
+    obj = {{ class_name }}() if '{{ class_name }}' else None
+    # WHEN
+    # TODO: trigger an edge-case
+    # THEN
+    pytest.fail("TODO: implement edge-case assertion")
+
+
+def test_error_handling_todo():
+    """Error handling: ensure validation or exceptions behave as documented."""
+    # GIVEN
+    obj = {{ class_name }}() if '{{ class_name }}' else None
+    # WHEN / THEN
+    pytest.fail("TODO: assert expected exception or error message")
+
+
+def test_additional_contracts_todo():
+    """Additional behavioural/contract test."""
+    # GIVEN
+    obj = {{ class_name }}() if '{{ class_name }}' else None
+    # WHEN
+    # TODO: exercise additional behaviour
+    # THEN
+    pytest.fail("TODO: implement additional behavioural assertion")
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-q"])

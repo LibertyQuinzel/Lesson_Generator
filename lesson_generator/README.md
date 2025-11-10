@@ -1,69 +1,178 @@
 # Lesson Generator
 
-AI-powered lesson generator for programming courses that creates comprehensive, structured lessons based on topics.
+AI-powered lesson generator for programming courses that creates comprehensive, structured lessons based on topics. Built with robust error handling, type safety, and extensive testing.
 
 ## 🚀 Quick Start
+
+### Prerequisites
+
+- Python 3.8 or higher
+- Virtual environment tool (venv recommended)
+- Git (for installation from source)
+- OpenAI API key (optional, for AI-powered generation)
 
 ### Installation
 
 ```bash
-# Install from PyPI (when published)
-pip install lesson-generator
+# 1. Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Or install from source
+# 2. Install from source (recommended for latest features)
 git clone https://github.com/LibertyQuinzel/lesson-generator.git
 cd lesson-generator
+pip install -r requirements.txt
 pip install -e .
+
+# Optional: Install development dependencies
+pip install -r requirements-dev.txt
+```
+
+### Development Setup
+
+For contributors and developers:
+```bash
+# Install development dependencies
+pip install -r requirements-dev.txt
+
+# Run tests
+pytest
+
+# Run linting
+pylint src/lesson_generator
+
+# Generate documentation
+pdoc --html --output-dir docs src/lesson_generator
 ```
 
 ### Basic Usage
 
 ```bash
-# Generate a single lesson
-lesson-generator create async_programming --output ./lessons
+# 1. Basic lesson generation
+lesson-generator create "defensive programming" --modules 2
 
-# Generate multiple lessons
-lesson-generator create async_programming design_patterns testing_strategies --output ./lessons
-
-# Use configuration file
-lesson-generator create --config topics.json --output ./lessons
-
-# Advanced options
-lesson-generator create async_programming \
+# 2. Multiple lessons with specific configuration
+lesson-generator create \
+    "defensive programming" \
+    "error handling" \
+    "iterators" \
+    --modules 2 \
     --difficulty intermediate \
-    --modules 5 \
-    --output ./lessons \
-    --openai-api-key your_api_key
+    --output ./my_lessons
+
+# 3. AI-powered generation (requires OpenAI API key)
+export OPENAI_API_KEY="your-key-here"
+lesson-generator create "advanced algorithms" \
+    --strict-ai \
+    --modules 3 \
+    --difficulty advanced
+
+# 4. Offline/fallback mode (no API key needed)
+lesson-generator create "basic python" \
+    --no-ai \
+    --modules 2 \
+    --difficulty beginner
 ```
 
-## Help
+### Error Handling & Validation
 
-Get command help and options at any time:
+The generator includes comprehensive error handling:
+
+1. **Input Validation**
+   - Topic/module names are automatically sanitized
+   - Invalid configurations are caught early
+   - Helpful error messages guide correction
+
+2. **Graceful Fallbacks**
+   - AI generation failures fall back to deterministic content
+   - File system errors are handled safely
+   - Network issues won't crash the generator
+
+3. **Error Reporting**
+   - Detailed logs in `errors.txt` per topic
+   - Clear error messages with context
+   - Stack traces for development debugging
+
+## Command Reference
+
+### Getting Help
 
 ```bash
-# Top-level help
+# View all commands
 lesson-generator --help
 
-# Help for the 'create' command
+# Get detailed help for specific command
 lesson-generator create --help
+
+# See version information
+lesson-generator --version
 ```
 
-Common options (create):
-- `--output PATH`           Output directory for generated lessons (default: ./generated_lessons)
-- `--modules N`             Number of modules per lesson (default: 5)
-- `--difficulty LEVEL`      One of: beginner | intermediate | advanced
-- `-b | -i | -a`            Shortcuts for `--difficulty` (beginner | intermediate | advanced)
-- `--no-ai`                 Use deterministic content (no API key required)
-- `--openai-api-key KEY`    API key (or set env var OPENAI_API_KEY)
-- `--strict-ai/--no-strict-ai` Require AI only or allow fallbacks (default: strict)
-- `--workers N`             Parallel topic processing (default: 1)
-- `--templates DIR`         Point to a directory of Jinja2 templates that override built-ins. Any file with the same name replaces the default. Precedence: `--templates` > templates extracted via `--reference` > built-ins.
-- `--reference DIR`         Extract templates from a reference lesson before generating
-- `--cache/--no-cache`      Turn the generation cache on/off (default: on). When enabled, repeated requests with the same inputs reuse prior results to avoid re-calling AI/fallback generators within a run; useful for iterative tweaks or multi-topic runs. Cache is local to the current process/run and not persisted.
+### Core Options
 
-Troubleshooting:
-- AI errors with strict mode: run with `--no-strict-ai` or `--no-ai`, or set `OPENAI_API_KEY` and ensure `openai` is installed.
-- See per-topic `errors.txt` inside the output topic folder for detailed generation logs.
+#### Output Control
+```bash
+--output PATH          # Output directory (default: ./generated_lessons)
+--modules N           # Modules per lesson (default: 5)
+--workers N          # Parallel processing threads (default: 1)
+```
+
+#### Difficulty Settings
+```bash
+--difficulty LEVEL    # Set complexity: beginner|intermediate|advanced
+-b                   # Shortcut for --difficulty beginner
+-i                   # Shortcut for --difficulty intermediate
+-a                   # Shortcut for --difficulty advanced
+```
+
+#### Content Generation
+```bash
+--strict-ai          # Require AI generation (default)
+--no-strict-ai      # Allow fallback content
+--no-ai             # Force deterministic content
+--openai-api-key KEY # Set API key (or use env var)
+```
+
+#### Template Customization
+```bash
+--templates DIR      # Override built-in templates
+--reference DIR     # Extract templates from reference
+--cache/--no-cache  # Enable/disable generation cache
+```
+
+### Troubleshooting Guide
+
+1. **AI Generation Issues**
+   - Error: "OpenAI API key not found"
+     ```bash
+     export OPENAI_API_KEY="your-key"
+     # or
+     lesson-generator create ... --openai-api-key "your-key"
+     ```
+   - Error: "AI generation failed"
+     ```bash
+     # Try with fallbacks enabled
+     lesson-generator create ... --no-strict-ai
+     ```
+
+2. **File System Issues**
+   - Error: "Permission denied"
+     ```bash
+     # Check directory permissions
+     sudo chown -R $USER:$USER ./generated_lessons
+     ```
+   - Error: "Directory not empty"
+     ```bash
+     # Use a clean output directory
+     lesson-generator create ... --output ./new_lessons
+     ```
+
+3. **Debug Logging**
+   - Check `errors.txt` in topic directory
+   - Run with increased verbosity:
+     ```bash
+     lesson-generator create ... --verbose
+     ```
 
 ### Environment Setup
 
@@ -98,6 +207,69 @@ Every generated lesson includes:
 You can customize or remove these by editing the templates under `src/lesson_generator/templates` or passing `--templates DIR` to override.
 
 ## 🏗️ Project Architecture
+
+### Code Quality Standards
+
+1. **Error Handling**
+   - Specific exception types for different error categories
+   - Graceful fallbacks for AI and file system operations
+   - Detailed error messages with context
+   - Proper exception chaining with `raise ... from`
+
+2. **Type Safety**
+   - Comprehensive type hints throughout
+   - Runtime type checking for critical operations
+   - Clear interface definitions
+   - MyPy validation in CI
+
+3. **Testing**
+   - 100% code coverage requirement
+   - Unit tests for all components
+   - Integration tests for full workflows
+   - Property-based testing for complex operations
+
+4. **Documentation**
+   - Google-style docstrings
+   - Clear function/class responsibilities
+   - Usage examples in docstrings
+   - Up-to-date architecture docs
+
+### Project Structure
+
+```
+lesson_generator/
+├── src/
+│   └── lesson_generator/
+│       ├── cli/           # Command line interface
+│       ├── core/          # Core generation logic
+│       ├── content/       # Content generation (AI/fallback)
+│       └── templates/     # Jinja2 templates
+├── tests/
+│   ├── unit/             # Unit tests
+│   └── integration/      # Integration tests
+├── docs/                 # Documentation
+└── examples/            # Example lessons
+```
+
+### Key Components
+
+1. **Core Engine** (`core/`)
+   - Generator orchestration
+   - File system management
+   - Template processing
+   - Error handling
+
+2. **Content Generation** (`content/`)
+   - OpenAI integration
+   - Fallback generation
+   - Content caching
+   - Template extraction
+
+3. **CLI Interface** (`cli/`)
+   - Command parsing
+   - Configuration management
+   - Progress reporting
+   - Error display
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed system design.
 

@@ -1,0 +1,47 @@
+"""
+Concrete tests for {{ test_target_name }}
+
+This template generates runnable tests (not student templates). The generated tests are intended 
+to fail until students implement the required behaviour in `assignment_b.py`.
+"""
+
+import pytest
+
+{% for import_stmt in test_imports %}
+{{ import_stmt }}
+{% endfor %}
+from {{ module_path }} import {{ class_name }}
+
+{% for t in test_methods %}
+def test_{{ t.name }}():
+    """{{ t.description | default('Behavioural test') }}"""
+    # GIVEN
+{{ (t.given_section | default('obj = ' ~ class_name ~ '()')) | indent(4, True) }}
+    # WHEN
+{{ (t.when_section | default('# TODO: exercise behaviour')) | indent(4, True) }}
+    # THEN
+{{ (t.then_section | default('assert False, "TODO: implement assertion"')) | indent(4, True) }}
+
+{% endfor %}
+
+{% if test_methods|length < 4 %}
+{# Ensure at least 4 tests for key behaviors #}
+{% set missing = 4 - test_methods|length %}
+{% for i in range(missing) %}
+def test_additional_behavior_{{ i + 1 }}():
+    """Additional behavioral test {{ i + 1 }}"""
+    # GIVEN
+    obj = {{ class_name }}()
+    # WHEN/THEN
+    # One of:
+    # - Edge case handling
+    # - Error conditions
+    # - State transitions
+    # - Special inputs
+    assert False, "TODO: implement test for additional behavior"
+
+{% endfor %}
+{% endif %}
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

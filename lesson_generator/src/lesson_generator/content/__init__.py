@@ -1,21 +1,45 @@
-"""Content generation interfaces and implementations."""
+"""Content generation interfaces and implementations.
+
+This module defines the interfaces and base implementations for generating lesson content.
+The main interfaces are:
+- ContentGenerator: Protocol defining content generation methods
+- FallbackContentGenerator: Default implementation for offline/test mode
+"""
 from __future__ import annotations
 
-from typing import Protocol, Dict, Any
+from typing import Protocol, Dict, Any, List, Optional
+
+# Type aliases for clarity
+ModuleDict = Dict[str, Any]
+TopicDict = Dict[str, Any]
+ContentDict = Dict[str, Any]
 
 
 class ContentGenerator(Protocol):
-    def plan_modules(self, topic_name: str, desired_count: int | None = None) -> Dict[str, Any]:
-        """Return a structured plan for modules given a high-level topic name.
+    """Protocol defining methods required for lesson content generation."""
+    
+    def plan_modules(self, topic_name: str, desired_count: Optional[int] = None) -> ContentDict:
+        """Return a structured plan for modules given a topic name.
+        
+        Args:
+            topic_name: The name of the topic to plan modules for
+            desired_count: Optional target number of modules to generate
 
-        Expected return keys:
-        - modules: List[dict] where each item includes at minimum
-            {name, title, type, focus_areas, complexity?, estimated_time?, includes_tests?, code_examples?}
-        - learning_objectives: List[str]
-        - key_concepts: List[str]
-        - resources: dict with optional keys {documentation_links, example_repositories, additional_reading}
+        Returns:
+            Dict containing:
+            - modules: List[ModuleDict] with minimum fields:
+                - name: Module identifier
+                - title: Human readable title
+                - type: Module type (starter, assignment, etc)
+                - focus_areas: List of key areas covered
+                - complexity: Optional difficulty indicator
+                - estimated_time: Optional minutes estimate
+                - includes_tests: Optional boolean
+                - code_examples: Optional example count
+            - learning_objectives: List[str] with key learning goals
+            - key_concepts: List[str] of core concepts covered
+            - resources: Optional dict with reference materials
         """
-        ...
     def learning_path(self, topic: dict, module: dict) -> Dict[str, Any]:
         ...
 
@@ -526,6 +550,7 @@ import pytest\n\n@pytest.fixture\ndef sample_items():\n    return [{'price': 2},
         }
 
     def tests_for_assignment(self, topic: dict, module: dict, assignment_ctx: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate test cases for assignments with guaranteed minimum test coverage."""
         class_name = assignment_ctx["class_name"]
         # Build module import path using provided module_number when available (defaults to 1)
         try:
@@ -533,41 +558,112 @@ import pytest\n\n@pytest.fixture\ndef sample_items():\n    return [{'price': 2},
         except Exception:
             module_number = 1
         module_path = f"module_{module_number}_{module['name']}"
-        # For Assignment A, generate a template test skeleton with TODOs and skip marker
+        
+        # Check if this should be a template (variant A) or complete tests (variant B)
         is_variant_a = (assignment_ctx.get("variant") or "a").lower() == "a"
-        template_skip_line = "pytest.skip('TODO: implement test body for Assignment A')"
-        return {
+        is_template_mode = is_variant_a or assignment_ctx.get("is_template", False)
+        
+        # Extract methods from source code or assignment context for test generation
+        methods = []
+        try:
+            if assignment_ctx.get("source_code"):
+                import ast
+                tree = ast.parse(assignment_ctx["source_code"])
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.FunctionDef) and not node.name.startswith('_'):
+                        methods.append({"name": node.name})
+        except Exception:
+            # Fall back to extracting from methods list if AST parsing fails
+            try:
+                methods = [{"name": m["name"]} for m in assignment_ctx.get("methods", [])]
+            except Exception:
+                pass
+
+        base_result = {
             "test_target_name": f"{class_name}",
-            "test_target_description": assignment_ctx["description"],
+            "test_target_description": assignment_ctx.get("description", "Assignment implementation"),
             "test_imports": [],
             "module_path": module_path,
             "class_name": class_name,
-            "test_coverage_areas": ["happy path", "empty input"],
+            "test_coverage_areas": ["happy path", "empty input", "error handling"],
             "fixtures": [],
-            "test_methods": [
-                {
-                    "name": "process_sums_numbers",
-                    "description": "Should sum numbers in list",
-                    "tests": "basic summation",
-                    "given_section": (template_skip_line if is_variant_a else f"obj = {class_name}()"),
-                    "when_section": ("" if is_variant_a else "result = obj.process([1,2,3])"),
-                    "then_section": ("" if is_variant_a else "assert result == 6"),
-                },
-                {
-                    "name": "process_handles_empty",
-                    "description": "Should handle None gracefully",
-                    "tests": "empty input",
-                    "given_section": (template_skip_line if is_variant_a else f"obj = {class_name}()"),
-                    "when_section": ("" if is_variant_a else "result = obj.process(None)"),
-                    "then_section": ("" if is_variant_a else "assert result == 0"),
-                },
-            ],
             "parametrized_tests": [],
             "error_tests": [],
             "integration_tests": [],
             "performance_tests": [],
             "test_utilities": [],
         }
+        
+        if is_template_mode:
+            # For Assignment A: Generate template tests with TODO placeholders for students to fill in
+            base_result.update({
+                "is_template": True,
+                "test_instructions": (
+                    "Write focused pytest tests for the assignment below.\n"
+                    "Each test should follow GIVEN / WHEN / THEN structure.\n"
+                    "Replace the TODO sections with actual test implementation.\n"
+                    "Ensure your tests cover: happy path, edge cases, and error handling."
+                ),
+                "test_methods": [
+                    {
+                        "name": "happy_path",
+                        "description": "Test the main functionality with valid inputs",
+                        "tests": "basic functionality",
+                        "given_section": f"obj = {class_name}()",
+                        "when_section": "# TODO: call the method under test with valid inputs",
+                        "then_section": "assert False, \"TODO: replace with expected assertion for happy path\"",
+                    },
+                    {
+                        "name": "edge_case_input",
+                        "description": "Test behavior with edge case or boundary inputs",
+                        "tests": "edge case handling",
+                        "given_section": f"obj = {class_name}()",
+                        "when_section": "# TODO: call the method with edge-case input (empty, None, etc.)",
+                        "then_section": "assert False, \"TODO: implement edge-case assertion\"",
+                    },
+                    {
+                        "name": "error_handling",
+                        "description": "Test error handling and validation",
+                        "tests": "error conditions",
+                        "given_section": f"obj = {class_name}()",
+                        "when_section": "# TODO: call the method in a way that should trigger error handling",
+                        "then_section": "assert False, \"TODO: assert expected exception or error behavior\"",
+                    },
+                ]
+            })
+        else:
+            # For Assignment B: Generate complete, working tests that will fail until students implement assignment_b.py
+            base_result.update({
+                "is_template": False,
+                "test_methods": [
+                    {
+                        "name": "process_works_with_valid_data",
+                        "description": "Should process valid data correctly",
+                        "tests": "basic functionality",
+                        "given_section": f"obj = {class_name}()",
+                        "when_section": "result = obj.process([1, 2, 3])",
+                        "then_section": "assert result == 6  # Expected sum of inputs",
+                    },
+                    {
+                        "name": "process_handles_empty_input",
+                        "description": "Should handle empty or None input gracefully",
+                        "tests": "edge case handling",
+                        "given_section": f"obj = {class_name}()",
+                        "when_section": "result = obj.process(None)",
+                        "then_section": "assert result == 0  # Expected default for empty input",
+                    },
+                    {
+                        "name": "process_validates_input_type",
+                        "description": "Should validate input types appropriately",
+                        "tests": "error handling",
+                        "given_section": f"obj = {class_name}()",
+                        "when_section": "# Test with invalid input type\nresult = obj.process(\"invalid\")",
+                        "then_section": "assert result is not None  # Expect some reasonable handling",
+                    },
+                ]
+            })
+        
+        return base_result
 
     # New fallback implementations returning deterministic content
     def readme(self, topic: dict) -> str:

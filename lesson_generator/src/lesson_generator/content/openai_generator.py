@@ -1,4 +1,4 @@
-"""OpenAI-powered content generator with retries and graceful fallbacks."""
+"""OpenAI-powered content generator with retries."""
 from __future__ import annotations
 
 import os
@@ -13,10 +13,9 @@ except Exception:  # pragma: no cover - import guard for environments without pa
 
 
 class OpenAIContentGenerator:
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o-mini", allow_fallbacks: bool = True) -> None:
+    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o-mini") -> None:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self.model = model
-        self.allow_fallbacks = allow_fallbacks
         self._client = None
         if self.api_key and OpenAI is not None:
             self._client = OpenAI(api_key=self.api_key)
@@ -62,57 +61,46 @@ class OpenAIContentGenerator:
         Produce JSON with keys: introduction, concepts (object keyed by focus name with philosophy, example_code, use_cases[], advantages[]), practical_examples (title, description, code, key_points[]), testing_areas[], advanced_concepts[] (title, description, example).
         Keep code Pythonic. Respond with JSON only.
         """
-        try:
-            import json
-
-            raw = self._complete(system, prompt)
-            return json.loads(raw)
-        except Exception:
-            # Optional fallback
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-
-            return FallbackContentGenerator().learning_path(topic, module)
+        import json
+        raw = self._complete(system, prompt)
+        return json.loads(raw)
 
     def starter_example(self, topic: dict, module: dict) -> Dict[str, Any]:
-        system = (
-            "You generate fully implemented, runnable Python starter examples that showcase the module's topic (not tests). "
-            "These are NOT smoke tests; they should provide a small but meaningful API (1–3 methods) that demonstrates the concept. "
-            "Constraints: deterministic behavior, no external dependencies, no network/file I/O, PEP 8 friendly. "
-            "Include a trivial demo() method returning 'ok' to support a separate smoke test file. "
-            "Style: concise and direct. Output must be valid JSON only. "
-            "Critically, when a module learning_path.md reference is provided, align the starter's focus, class_name, methods, and examples to that reference. "
-            "Do not contradict the reference; prefer its terminology."
-        )
-        lp_md = module.get("learning_path_md", "")
-        difficulty = (topic.get("difficulty") or "intermediate").lower()
-        lp_note = "Learning path reference provided below. Use it to match concepts and objectives." if lp_md else "No learning path reference provided. Use topic/module fields only."
-        prompt = f"""
-        Topic: {topic['title']}, Module: {module['title']}
-        {lp_note}
-
-        Reference - learning_path.md:
-        ---
-        {lp_md}
-        ---
-
-        Difficulty: {difficulty}
-        Adjust API complexity by difficulty: beginner = 1-2 very simple public methods; intermediate = 2-3 methods of moderate complexity; advanced = 3-4 methods and include at least one small edge-case handling path. Keep deterministic behavior.
-
-        Provide JSON matching keys: title, description, learning_objectives[], detailed_explanation, imports[], class_name, class_description, concepts[], methods[] (name, parameters, docstring, demonstrates, args[], return_type, return_description, example_usage, example_output, explanation, implementation), demonstrations[] (function_call).
-        Keep implementations short and runnable. Ensure titles, concepts, and examples are consistent with the learning path when available. JSON only.
-        """
+        """Generate a starter example with fallback to deterministic content."""
         try:
             import json
+            system = (
+                "You generate fully implemented, runnable Python starter examples that showcase the module's topic (not tests). "
+                "These are NOT smoke tests; they should provide a small but meaningful API (1–3 methods) that demonstrates the concept. "
+                "Constraints: deterministic behavior, no external dependencies, no network/file I/O, PEP 8 friendly. "
+                "Include a trivial demo() method returning 'ok' to support a separate smoke test file. "
+                "Style: concise and direct. Output must be valid JSON only. "
+                "Critically, when a module learning_path.md reference is provided, align the starter's focus, class_name, methods, and examples to that reference. "
+                "Do not contradict the reference; prefer its terminology."
+            )
+            lp_md = module.get("learning_path_md", "")
+            difficulty = (topic.get("difficulty") or "intermediate").lower()
+            lp_note = "Learning path reference provided below. Use it to match concepts and objectives." if lp_md else "No learning path reference provided. Use topic/module fields only."
+            prompt = f"""
+            Topic: {topic['title']}, Module: {module['title']}
+            {lp_note}
 
+            Reference - learning_path.md:
+            ---
+            {lp_md}
+            ---
+
+            Difficulty: {difficulty}
+            Adjust API complexity by difficulty: beginner = 1-2 very simple public methods; intermediate = 2-3 methods of moderate complexity; advanced = 3-4 methods and include at least one small edge-case handling path. Keep deterministic behavior.
+
+            Provide JSON matching keys: title, description, learning_objectives[], detailed_explanation, imports[], class_name, class_description, concepts[], methods[] (name, parameters, docstring, demonstrates, args[], return_type, return_description, example_usage, example_output, explanation, implementation), demonstrations[] (function_call).
+            Keep implementations short and runnable. Ensure titles, concepts, and examples are consistent with the learning path when available. JSON only.
+            """
             raw = self._complete(system, prompt)
             return json.loads(raw)
         except Exception:
-            if not self.allow_fallbacks:
-                raise
+            # Fall back to deterministic content
             from lesson_generator.content import FallbackContentGenerator
-
             return FallbackContentGenerator().starter_example(topic, module)
 
     # Direct code variant: return a complete Python file as str
@@ -145,18 +133,7 @@ class OpenAIContentGenerator:
 
         Output: ONLY the Python code for the file, no backticks.
         """
-        try:
-            return self._complete(system, prompt, temperature=0.4)
-        except Exception:
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-
-            ctx = FallbackContentGenerator().starter_example(topic, module)
-            from lesson_generator.core.template_engine import TemplateEngine  # local import to avoid cycles
-            # Render using built-in template as a fallback path
-            eng = TemplateEngine(None)
-            return eng.render("starter_example.py.j2", {"example": ctx})
+        return self._complete(system, prompt, temperature=0.4)
 
     def assignment(self, topic: dict, module: dict, variant: str = "a") -> Dict[str, Any]:
         system = (
@@ -187,17 +164,9 @@ class OpenAIContentGenerator:
     Provide JSON for keys: title, description, imports[], class_name, class_description, learning_focus, methods[] (name, parameters, docstring, args[], return_type, return_description, examples[] (usage, expected_output), implementation), helper_functions[], examples[] (description, code).
         Keep simple and testable. Ensure naming and behaviors reflect the referenced learning path where provided. JSON only.
         """
-        try:
-            import json
-
-            raw = self._complete(system, prompt)
-            return json.loads(raw)
-        except Exception:
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-
-            return FallbackContentGenerator().assignment(topic, module, variant)
+        import json
+        raw = self._complete(system, prompt)
+        return json.loads(raw)
 
     # Direct code variant for assignments
     def assignment_code(self, topic: dict, module: dict, variant: str = "a") -> str:
@@ -238,73 +207,67 @@ class OpenAIContentGenerator:
 
         Output: ONLY the Python code for the file, no backticks.
         """
-        try:
-            return self._complete(system, prompt, temperature=0.4)
-        except Exception:
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-
-            ctx = FallbackContentGenerator().assignment(topic, module, variant)
-            from lesson_generator.core.template_engine import TemplateEngine  # local import
-            eng = TemplateEngine(None)
-            return eng.render("assignment.py.j2", ctx)
+        return self._complete(system, prompt, temperature=0.4)
 
     def tests_for_assignment(self, topic: dict, module: dict, assignment_ctx: Dict[str, Any]) -> Dict[str, Any]:
-        system = (
-            "You generate focused pytest tests for a given assignment. "
-            "You WILL be provided the full source code of the assignment file to align imports, class/function names, and behaviors. "
-            "Constraints: minimal imports, deterministic behavior, no I/O, keep tests short and readable. "
-            "Hard limit: produce at most 4 tests total across all lists; prefer filling 'test_methods' first, then leave other lists empty if the limit would be exceeded. "
-            "Style: concise descriptions and names. Output must be valid JSON only. "
-            "When a learning_path.md reference is provided, prioritize covering behaviors and examples mentioned there. "
-            "Variant-specific rules: If assignment_ctx.variant == 'a' (case-insensitive), generate a TEST TEMPLATE for students: "
-            "keep test names and docstrings, set GIVEN/WHEN/THEN sections to TODO placeholders. Tests should be incomplete and FAIL by default (do NOT skip). "
-            "If assignment_ctx.variant == 'b', generate fully implemented tests that will initially fail until students implement assignment_b.py."
-        )
-        lp_md = module.get("learning_path_md", "")
-        lp_note = "Use the learning path reference to choose assertions and edge cases." if lp_md else "No learning path reference provided. Use assignment_ctx and source code only."
-        prompt = f"""
-        Given the following assignment for module {module['title']}:
-
-        - Variant: {assignment_ctx.get('variant')}
-        - Declared class_name (if provided): {assignment_ctx.get('class_name')}
-
-        Assignment source code (verbatim):
-        ---
-        {assignment_ctx.get('source_code', '')}
-        ---
-
-        Create JSON for keys used by test_template: test_target_name, test_target_description, test_imports[], module_path, class_name, test_coverage_areas[], fixtures[], test_methods[] (name, description, tests, given_section, when_section, then_section), parametrized_tests[], error_tests[], integration_tests[], performance_tests[], test_utilities[].
-
-    Rules:
-        - Infer the public API (class and method names) from the source code when present; prefer assignment_ctx.class_name if both are present but keep names consistent.
-        - Set module_path to the package module path (e.g., module_{{module_number}}_{{module_name}}) not a file path; the package's __init__.py re-exports classes.
-        - Keep imports minimal; prefer importing only pytest and the target class from module_path.
-    - Respect the variant rules stated above; for variant 'a' produce TODO sections that lead to FAILING tests until implemented.
-
-        {lp_note}
-
-        Reference - learning_path.md:
-        ---
-        {lp_md}
-        ---
-
-        JSON only.
-        """
+        """Generate tests for an assignment with fallback to deterministic content."""
         try:
             import json
+            system = (
+                "You generate advanced test cases for Python code assignments. "
+                "Focus on complete coverage including edge cases and error handling. "
+                "Output valid JSON with fields: class_name, fixtures, test_methods, test_utilities, etc. "
+                "Style: clear test names, descriptive docstrings, given/when/then comments. "
+                "Strictly match API/error handling from assignment context."
+            )
+            lp_md = module.get("learning_path_md", "")
+            difficulty = (topic.get("difficulty") or "intermediate").lower()
+            lp_note = "Learning path reference provided below. Use it to match concepts and objectives." if lp_md else "No learning path reference provided. Use topic/module fields only."
+            prompt = f"""
+            Topic: {topic['title']}, Module: {module['title']}
+            {lp_note}
 
+            Reference - learning_path.md:
+            ---
+            {lp_md}
+            ---
+
+            Assignment context:
+            {assignment_ctx}
+
+            Testing needs by difficulty level:
+            - beginner: 3-4 clear success/validation tests with simple edge cases
+            - intermediate: 5-6 tests including input/param validation and error handling
+            - advanced: 7+ thorough tests handling all edge cases and error paths
+
+            Provide JSON with: test_target_name, test_target_description, test_imports[], class_name, test_coverage_areas[], is_template (true for student files), test_methods[] (name, description, given_section, when_section, then_section), fixtures[], test_utilities[], test_performance[] (method_name, test_description, test_implementation).
+
+            Focus on testing:
+            1. Core functionality with parameterized inputs
+            2. Input validation and error handling
+            3. Edge cases/boundary conditions
+            4. Special case handling
+            5. Any documented API requirements
+            Adapt tests to difficulty level but keep beginner tests relatively simple. JSON output only.
+            """
             raw = self._complete(system, prompt)
-            data = json.loads(raw)
-            return data
+            return json.loads(raw)
         except Exception:
-            if not self.allow_fallbacks:
-                raise
+            # Fall back to deterministic content
             from lesson_generator.content import FallbackContentGenerator
-
-            data = FallbackContentGenerator().tests_for_assignment(topic, module, assignment_ctx)
-            return data
+            out = FallbackContentGenerator().tests_for_assignment(topic, module, assignment_ctx)
+            return {
+                'test_target_name': assignment_ctx.get('class_name', 'Example'),
+                'test_target_description': assignment_ctx.get('description', 'Sample implementation'),
+                'test_imports': ['pytest'],
+                'class_name': assignment_ctx.get('class_name', 'Example'),
+                'test_coverage_areas': ['Basic functionality', 'Error handling'],
+                'is_template': True,
+                'test_methods': [{'name': 'test_basic', 'description': 'Test basic functionality', 'given_section': 'obj = Example()', 'when_section': 'result = obj.demo()', 'then_section': 'assert result == "ok"'}],
+                'fixtures': [],
+                'test_utilities': [],
+                'test_performance': []
+            }
 
     # New AI-driven generators returning full file contents
     def readme(self, topic: dict) -> str:
@@ -320,14 +283,7 @@ class OpenAIContentGenerator:
         Topic JSON:
         {topic}
         """
-        try:
-            return self._complete(system, prompt, temperature=0.5)
-        except Exception:
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-
-            return FallbackContentGenerator().readme(topic)
+        return self._complete(system, prompt, temperature=0.5)
 
     def extra_exercises(self, topic: dict, module: dict, module_number: int) -> str:
         system = (
@@ -341,14 +297,7 @@ class OpenAIContentGenerator:
         Module: {module['title']}
         Focus Areas: {', '.join(module.get('focus_areas', []))}
         """
-        try:
-            return self._complete(system, prompt, temperature=0.6)
-        except Exception:
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-
-            return FallbackContentGenerator().extra_exercises(topic, module, module_number)
+        return self._complete(system, prompt, temperature=0.6)
 
     def starter_smoke_test(self, module_path: str, class_name: str | None, methods: list[dict] | None = None) -> str:
         system = (
@@ -374,14 +323,7 @@ class OpenAIContentGenerator:
             - asserts that calling mod.demo() returns 'ok'
             Keep it concise and deterministic. Only output test code.
             """
-        try:
-            code = self._complete(system, prompt, temperature=0.2)
-            return code
-        except Exception:
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-            return FallbackContentGenerator().starter_smoke_test(module_path, class_name, methods)
+        return self._complete(system, prompt, temperature=0.2)
 
     def plan_modules(self, topic_name: str, desired_count: int | None = None) -> Dict[str, Any]:
         """Use the model to propose a module outline for a given topic.
@@ -416,17 +358,9 @@ class OpenAIContentGenerator:
         }}
         JSON only, no commentary.
         """
-        try:
-            import json
-
-            raw = self._complete(system, prompt, temperature=0.6)
-            data = json.loads(raw)
-            # Minimal validation/normalization
-            data["modules"] = data.get("modules") or []
-            return data
-        except Exception:
-            if not self.allow_fallbacks:
-                raise
-            from lesson_generator.content import FallbackContentGenerator
-
-            return FallbackContentGenerator().plan_modules(topic_name, desired_count)
+        import json
+        raw = self._complete(system, prompt, temperature=0.6)
+        data = json.loads(raw)
+        # Minimal validation/normalization
+        data["modules"] = data.get("modules") or []
+        return data
