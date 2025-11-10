@@ -62,3 +62,7 @@ temp/
 # Generated lessons output (for testing)
 test_output/
 generated_lessons/
+# Exclude parent directory content
+../v1_gl*
+../reference_lesson/
+../generated_lessons/
