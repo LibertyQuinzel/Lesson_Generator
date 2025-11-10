@@ -215,7 +215,9 @@ def create_cmd(
         try:
             from lesson_generator.content.openai_generator import OpenAIContentGenerator
 
-            content_gen = OpenAIContentGenerator(api_key=openai_api_key, allow_fallbacks=not strict_ai)
+            # OpenAIContentGenerator currently expects only an optional api_key argument.
+            # The allow_fallbacks concept is handled by the CLI logic (strict_ai flag).
+            content_gen = OpenAIContentGenerator(api_key=openai_api_key)
         except Exception:
             content_gen = None
 

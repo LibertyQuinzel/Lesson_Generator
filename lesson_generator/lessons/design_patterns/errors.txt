@@ -1,0 +1,3 @@
+[design_patterns] module 1:design_patterns_intro step=tests_a -> Unexpected end of template. Jinja was looking for the following tags: 'endif'. The innermost block that needs to be closed is 'if'.
+[design_patterns] module 2:design_patterns_application step=tests_a -> Unexpected end of template. Jinja was looking for the following tags: 'endif'. The innermost block that needs to be closed is 'if'.
+[design_patterns] module 2:design_patterns_application step=tests_b -> Unexpected end of template. Jinja was looking for the following tags: 'endif'. The innermost block that needs to be closed is 'if'.

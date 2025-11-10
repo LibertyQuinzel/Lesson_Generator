@@ -2,43 +2,128 @@
 
 ## 🎯 Learning Objectives
 
-By the end of this module, you will understand:
-{% for objective in topic.learning_objectives %}
+By the end of this module, you will be able to:
+{% for objective in content.module_objectives|default(topic.learning_objectives) %}
 - {{ objective }}
 {% endfor %}
 
----
-
 ## 📚 Step 1: Understanding the Concepts
 
-### {{ module.title }} Fundamentals
+### {{ module.title }} Overview
 
-{{ content.introduction }}
+{{ content.introduction|default('This module introduces key concepts and practical implementations of ' ~ module.title ~ '.') }}
 
 {% for concept in (module.focus_areas or []) %}
 ### {{ concept|title|replace('_', ' ') }}
 
-**Philosophy**: {{ content.concepts[concept].philosophy }}
+**Philosophy**: {{ content.concepts[concept].philosophy|default('Understanding ' ~ concept|replace('_', ' ') ~ ' is crucial for robust code.') }}
 
 ```python
-{{ content.concepts[concept].example_code }}
+{{ content.concepts[concept].example_code|default('# Example will be provided in starter_example.py') }}
 ```
 
-**When to use {{ concept }}**:
-{% for use_case in (content.concepts[concept].use_cases or []) %}
+**When to use**:
+{% for use_case in (content.concepts[concept].use_cases or ['Specific use cases will be covered in assignments']) %}
 - {{ use_case }}
 {% endfor %}
 
-**Advantages**:
-{% for advantage in (content.concepts[concept].advantages or []) %}
-- {{ advantage }}
+**Key Benefits**:
+{% for benefit in (content.concepts[concept].benefits or ['Improved code reliability', 'Better error handling', 'Cleaner implementation']) %}
+- {{ benefit }}
 {% endfor %}
 
 {% endfor %}
 
-## 🔧 Step 2: Hands-On Implementation
+## 🔧 Step 2: Implementation Guide
 
-### Practical Examples
+### Key Implementation Patterns
+
+{% for pattern in content.implementation_patterns|default(['Pattern details will be covered in assignments']) %}
+- {{ pattern }}
+{% endfor %}
+
+### Best Practices
+{% for practice in content.best_practices|default(['Write clear and descriptive code', 'Follow Python conventions', 'Include proper documentation']) %}
+- {{ practice }}
+{% endfor %}
+
+### Common Pitfalls to Avoid
+{% for pitfall in content.pitfalls|default(['Unclear implementation', 'Poor error handling', 'Inconsistent patterns']) %}
+- {{ pitfall }}
+{% endfor %}
+
+## 📝 Step 3: Assignments
+
+This module includes the following assignments to practice the concepts:
+
+{% for assignment in assignments %}
+### {{ assignment.name|title|replace('_', ' ') }}
+- **Difficulty**: {{ assignment.complexity|title }}
+- **Estimated Time**: {{ assignment.estimated_time }} minutes
+- **Focus**: {{ assignment.focus_areas|join(', ') }}
+- **File**: `{{ assignment.filename }}`
+
+{% endfor %}
+
+## 🧪 Step 4: Testing Your Implementation
+
+### Test Requirements
+- Write comprehensive unit tests
+- Cover both success and error cases
+- Include edge case testing
+- Aim for 100% code coverage
+
+### What to Test
+{% for area in content.test_areas|default(['Basic functionality', 'Error conditions', 'Edge cases', 'Integration with other components']) %}
+- {{ area }}
+{% endfor %}
+
+## 🎓 Step 5: Advanced Topics
+{% if content.advanced_topics %}
+{% for topic in content.advanced_topics %}
+### {{ topic.title }}
+{{ topic.description }}
+
+```python
+{{ topic.example|default('# Example code will be provided in extra_exercises.md') }}
+```
+{% endfor %}
+{% else %}
+Advanced topics and additional challenges can be found in `extra_exercises.md`.
+{% endif %}
+
+## 📖 Additional Resources
+
+### Documentation
+{% for link in (topic.resources.documentation_links or []) %}
+- [{{ link|replace('https://', '')|replace('.html', '')|replace('.org', '')|replace('docs.python.org/3/', 'Python Docs: ')|title }}]({{ link }})
+{% endfor %}
+
+### Further Reading
+{% for reading in (topic.resources.additional_reading or []) %}
+- {{ reading }}
+{% endfor %}
+
+## ✅ Completion Checklist
+
+- [ ] Read and understand all concepts
+- [ ] Complete starter example
+- [ ] Implement Assignment A
+- [ ] Pass all tests for Assignment A
+{% if assignments|length > 1 %}
+- [ ] Implement Assignment B
+- [ ] Pass all tests for Assignment B
+{% endif %}
+- [ ] Review extra exercises
+- [ ] Achieve 100% test coverage
+
+## � Next Steps
+
+1. Start with the starter example to understand basic implementation
+2. Move on to Assignment A for guided practice
+3. Complete Assignment B for advanced implementation
+4. Explore extra exercises for additional practice
+5. Review advanced topics when ready
 
 {% for example in (content.practical_examples or []) %}
 #### {{ example.title }}

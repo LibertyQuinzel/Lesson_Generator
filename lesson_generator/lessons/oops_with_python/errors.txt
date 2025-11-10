@@ -1,0 +1,3 @@
+[oops_with_python] module 1:oop_introduction step=tests_a -> Unexpected end of template. Jinja was looking for the following tags: 'endif'. The innermost block that needs to be closed is 'if'.
+[oops_with_python] module 2:advanced_oop_concepts step=tests_a -> Unexpected end of template. Jinja was looking for the following tags: 'endif'. The innermost block that needs to be closed is 'if'.
+[oops_with_python] module 2:advanced_oop_concepts step=tests_b -> Unexpected end of template. Jinja was looking for the following tags: 'endif'. The innermost block that needs to be closed is 'if'.

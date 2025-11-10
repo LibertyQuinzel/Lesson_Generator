@@ -1,0 +1,2 @@
+[iterators] module 2:custom_iterators step=learning_path -> 'dict object' has no attribute 'practical_use_cases'
+[iterators] module 2:custom_iterators step=tests_b -> invalid syntax (test_assignment_b.py, line 28)
